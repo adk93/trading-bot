@@ -10,5 +10,9 @@ class Strategy:
         self.dates = np.array(dates)
 
     @abstractmethod
-    def decision(self) -> bool:
+    def should_buy(self) -> bool:
+        pass
+
+    @abstractmethod
+    def should_sell(self) -> bool:
         pass

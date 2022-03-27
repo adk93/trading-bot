@@ -1,42 +1,30 @@
 # Standard library imports
-from typing import List
-import datetime
+import logging
 
 # Third-party imports
-import numpy as np
 
 # Local app imports
 from .strategies import Strategy
+from Exchanges import Exchange
+
 
 class Trader:
-    """Trader module makes calculation and makes decisions to buy or not to buy"""
-    def __init__(self, ticker: str, prices: List[float], dates: List[datetime.datetime]):
-        self.ticker = ticker
-        self.prices = prices
-        self.dates = dates
-        self.strategies = list()
+    def __init__(self, exchange: Exchange, trading_strategy: Strategy):
+        self.exchange = exchange
+        self.trading_strategy = trading_strategy
 
-    @classmethod
-    def from_xtbapi(cls, ticker: str, rate_info_records: List):
-        """Takes as a parameter a list of XTB rate info records"""
-        prices = [x['open'] + x['close'] for x in rate_info_records]
-        dates = [datetime.datetime.fromtimestamp(x['ctm']/1000) for x in rate_info_records]
+    def run(self, symbol: str) -> None:
+        prices, dates = self.exchange.get_market_data(symbol)
+        should_buy = self.trading_strategy.should_buy(prices, dates)
+        should_sell = self.trading_strategy.should_sell(prices, dates)
 
-        return cls(ticker, prices, dates)
+        if should_buy:
+            logging.info(f"fStrategy {self.trading_strategy} recommends to BUY {symbol}")
+            self.exchange.buy(symbol)
 
-    def add_strategies(self, *strategies: List[Strategy]):
-        for strategy in strategies:
-            self.strategies.append(strategy)
+        elif should_sell:
+            logging.info(f"fStrategy {self.trading_strategy} recommends to SELL {symbol}")
+            self.exchange.sell(symbol)
 
-    @property
-    def read_strategies(self):
-        return [str(x) for x in self.strategies]
-
-    def get_decisions(self):
-        for strategy in self.strategies:
-            s = strategy(self.prices, self.dates)
-            d = s.decision()
-            print(f"{s} suggests {d}")
-
-
-
+        else:
+            print(f"No action needed for {symbol}")
