@@ -41,10 +41,13 @@ class XTBClient:
         self.s = connect_to_socket()
 
     @staticmethod
-    def prepare_message(command: str, arguments: dict) -> json:
+    def prepare_message(command: str, arguments: dict, stream_session_id: str) -> json:
         message = {"command": command}
         if arguments is not None:
             message.update({"arguments": arguments})
+
+        if stream_session_id is not None:
+            message.update({'streamSessionId': stream_session_id})
 
         return json.dumps(message).encode("utf-8")
 
@@ -64,11 +67,11 @@ class XTBClient:
 
         return json_response
 
-    def make_call(self, command: str, arguments: dict = None) -> dict:
+    def make_call(self, command: str, arguments: dict = None, stream_session_id: str | None = None) -> dict:
         """Procedure of building request, sending and retrieving data"""
 
         # Prepare a message made of command and arguments
-        message = self.prepare_message(command, arguments)
+        message = self.prepare_message(command, arguments, stream_session_id)
 
         # Send request to a server
         self.send_request(message)

@@ -20,7 +20,7 @@ def main():
         trading_strategy=MovingAverage
     )
 
-    bot.run("EUR/PLN")
+    bot.run("EURPLN")
 
 if __name__ == "__main__":
     main()

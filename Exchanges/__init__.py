@@ -14,7 +14,7 @@ class ExchangeConnectionError(Exception):
 class Exchange:
 
     @abstractmethod
-    def get_market_data(self, symbol: str) -> Tuple[List[float], List[datetime]]:
+    def get_market_data(self, symbol: str) -> Tuple[List[float], List[datetime.datetime]]:
         pass
 
     @abstractmethod
